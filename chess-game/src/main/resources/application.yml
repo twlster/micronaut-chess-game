@@ -1,0 +1,7 @@
+micronaut:
+  application:
+  name: chess-game
+  router:
+    static-resources:
+      default:
+        paths: classpath:public

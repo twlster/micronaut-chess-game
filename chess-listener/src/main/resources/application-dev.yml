@@ -1,0 +1,22 @@
+micronaut:
+  server:
+    port: 8081
+
+datasources:
+  default:
+    url: jdbc:h2:mem:devDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: ''
+    driverClassName: org.h2.Driver
+    schema-generate: none
+    dialect: H2
+
+liquibase:
+  enabled: true
+  datasources:
+    default:
+      change-log: 'classpath:db/h2/changelog.yaml'
+
+kafka:
+  bootstrap:
+    servers: localhost:9092

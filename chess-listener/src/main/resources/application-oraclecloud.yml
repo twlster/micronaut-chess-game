@@ -1,0 +1,48 @@
+#datasources:
+#  default:
+#    ocid:
+#    walletPassword:
+#    username: micronautdemo
+#    password:
+#
+#oci:
+#  config:
+#    profile: DEFAULT
+#
+#liquibase:
+#  enabled: true
+#  datasources:
+#    default:
+#      change-log: 'classpath:db/migration/oracle'
+###Reuse H2 DB because can't create a DB right away.
+datasources:
+  default:
+    url: jdbc:h2:mem:devDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: ''
+    driverClassName: org.h2.Driver
+    schema-generate: none
+    dialect: H2
+
+liquibase:
+  enabled: true
+  datasources:
+    default:
+      change-log: 'classpath:db/h2/changelog.yaml'
+
+kafka:
+  bootstrap:
+    servers: ##FQDN
+  security:
+    protocol: SASL_SSL
+  sasl:
+    mechanism: PLAIN
+    jaas:
+      config: #org.apache.kafka.common.security.plain.PlainLoginModule required username="<tenancy-name>/<username>/<stream-pool-ocid>" password="<auth-token>";
+  retries: 3
+  max:
+    request:
+      size: 1048576 #1MB
+    partition:
+      fetch:
+        bytes: 1048576 #1MB

@@ -13,9 +13,3 @@ out/
 .settings
 .classpath
 .factorypath
-*.log
-*.html
-*/abandoned/*
-*/logs/*
-logs/*
-*/reports/*

@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: v_1_0_0
+      author: "Jose Prieto"
+      comment: "Initial chess database schemas"
+      sqlFile:
+        encoding: utf8
+        relativeToChangelogFile: true
+        stripComments: true
+        path: "changelog/main-changelog.sql"
