@@ -1,83 +1,11 @@
-plugins {
-    id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("io.micronaut.application") version "4.4.2"
-    id("io.micronaut.aot") version "4.4.2"
-}
-
-version = "0.1"
-group = "example.micronaut.chess"
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("io.micronaut.data:micronaut-data-processor")
-    annotationProcessor("io.micronaut:micronaut-http-validation")
-    annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
-    annotationProcessor("io.micronaut.validation:micronaut-validation-processor")
-    implementation("io.micrometer:context-propagation")
-    implementation("io.micronaut.data:micronaut-data-jdbc")
-    implementation("io.micronaut.kafka:micronaut-kafka")
-    implementation("io.micronaut.liquibase:micronaut-liquibase")
-    implementation("io.micronaut.reactor:micronaut-reactor")
-    implementation("io.micronaut.serde:micronaut-serde-jackson")
-    implementation("io.micronaut.sql:micronaut-jdbc-hikari")
-    implementation("io.micronaut.validation:micronaut-validation")
-    implementation("jakarta.validation:jakarta.validation-api")
-
-    implementation("io.micronaut.oraclecloud:micronaut-oraclecloud-atp") // for oracle only
-
-    compileOnly("io.micronaut:micronaut-http-client")
-    compileOnly("org.projectlombok:lombok")
-    runtimeOnly("ch.qos.logback:logback-classic")
-    runtimeOnly("com.h2database:h2")
-    runtimeOnly("org.yaml:snakeyaml")
-    testImplementation("io.micronaut:micronaut-http-client")
-    testImplementation("org.testcontainers:junit-jupiter")
-    testImplementation("org.testcontainers:kafka")
-    testImplementation("org.testcontainers:oracle-xe")
-    testImplementation("org.awaitility:awaitility:4.2.0")
-    testImplementation("org.testcontainers:testcontainers")
-}
-
-
 application {
     mainClass = "example.micronaut.chess.Application"
 }
-java {
-    sourceCompatibility = JavaVersion.toVersion("21")
-    targetCompatibility = JavaVersion.toVersion("21")
+// Extra config.
+tasks.test {
+//    dependsOn tasks.named("initContainer")
+//    doLast {
+//        finalizedBy 'stopContainer'
+//    }
 }
-
-
-graalvmNative.toolchainDetection = false
-
-micronaut {
-    runtime("netty")
-    testRuntime("junit5")
-    processing {
-        incremental(true)
-        annotations("example.micronaut.chess.*")
-    }
-    aot {
-        // Please review carefully the optimizations enabled below
-        // Check https://micronaut-projects.github.io/micronaut-aot/latest/guide/ for more details
-        optimizeServiceLoading = false
-        convertYamlToJava = false
-        precomputeOperations = true
-        cacheEnvironment = true
-        optimizeClassLoading = true
-        deduceEnvironment = true
-        optimizeNetty = true
-        replaceLogbackXml = true
-    }
-}
-
-
-tasks.named("dockerfileNative") {
-    jdkVersion = "21"
-}
-
 

@@ -1,0 +1,3 @@
+rootProject.name = 'micronaut-chess-game'
+
+include("chess-game", "chess-listener")

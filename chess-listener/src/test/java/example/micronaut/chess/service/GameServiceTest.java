@@ -37,14 +37,14 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
-@Testcontainers
+//@Testcontainers
 @MicronautTest
 @TestInstance(PER_CLASS)
 class GameServiceTest implements TestPropertyProvider {
 
-    @Container
-    static KafkaContainer kafka = new KafkaContainer(
-            DockerImageName.parse("confluentinc/cp-kafka:latest"));
+//    @Container
+//    static KafkaContainer kafka = new KafkaContainer(
+//            DockerImageName.parse("confluentinc/cp-kafka:latest"));
 
     @Inject
     GameReporter gameReporter;
@@ -59,7 +59,7 @@ class GameServiceTest implements TestPropertyProvider {
     @Override
     public Map<String, String> getProperties() {
         return Collections.singletonMap(
-                "kafka.bootstrap.servers", kafka.getBootstrapServers()
+                "kafka.bootstrap.servers", "localhost:9092"
         );
     }
 

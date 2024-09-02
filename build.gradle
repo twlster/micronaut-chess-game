@@ -1,0 +1,136 @@
+plugins {
+    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("io.micronaut.application") version "4.4.2"
+    id("io.micronaut.aot") version "4.4.2"
+}
+
+allprojects {
+
+    version = "0.1"
+    group = "example.micronaut.chess"
+
+    repositories {
+        mavenCentral()
+    }
+
+    graalvmNative.toolchainDetection = false
+
+}
+
+subprojects {
+    apply plugin: 'com.github.johnrengelman.shadow'
+    apply plugin: 'io.micronaut.application'
+    apply plugin: 'io.micronaut.aot'
+
+    dependencies {
+        annotationProcessor("org.projectlombok:lombok")
+        annotationProcessor("io.micronaut.data:micronaut-data-processor")
+        annotationProcessor("io.micronaut:micronaut-http-validation")
+        annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
+        annotationProcessor("io.micronaut.validation:micronaut-validation-processor")
+        implementation("io.micrometer:context-propagation")
+        implementation("io.micronaut.data:micronaut-data-jdbc")
+        implementation("io.micronaut.kafka:micronaut-kafka")
+        implementation("io.micronaut.liquibase:micronaut-liquibase")
+        implementation("io.micronaut.reactor:micronaut-reactor")
+        implementation("io.micronaut.serde:micronaut-serde-jackson")
+        implementation("io.micronaut.sql:micronaut-jdbc-hikari")
+        implementation("io.micronaut.validation:micronaut-validation")
+        implementation("jakarta.validation:jakarta.validation-api")
+
+        implementation("io.micronaut.oraclecloud:micronaut-oraclecloud-atp") // for oracle only
+
+        compileOnly("io.micronaut:micronaut-http-client")
+        compileOnly("org.projectlombok:lombok")
+        runtimeOnly("ch.qos.logback:logback-classic")
+        runtimeOnly("com.h2database:h2")
+        runtimeOnly("org.yaml:snakeyaml")
+        testImplementation("io.micronaut:micronaut-http-client")
+        testImplementation("org.testcontainers:junit-jupiter")
+        testImplementation("org.testcontainers:kafka")
+        testImplementation("org.testcontainers:oracle-xe")
+        testImplementation("org.awaitility:awaitility:4.2.0")
+        testImplementation("org.testcontainers:testcontainers")
+    }
+
+    java {
+        sourceCompatibility = JavaVersion.toVersion("17")
+        targetCompatibility = JavaVersion.toVersion("17")
+    }
+
+
+    micronaut {
+        runtime("netty")
+        testRuntime("junit5")
+        processing {
+            incremental(true)
+            annotations("example.micronaut.chess.*")
+        }
+        aot {
+            // Please review carefully the optimizations enabled below
+            // Check https://micronaut-projects.github.io/micronaut-aot/latest/guide/ for more details
+            optimizeServiceLoading = false
+            convertYamlToJava = false
+            precomputeOperations = true
+            cacheEnvironment = true
+            optimizeClassLoading = true
+            deduceEnvironment = true
+            optimizeNetty = true
+            replaceLogbackXml = true
+        }
+    }
+
+    tasks.named("dockerfileNative") {
+        jdkVersion = "17"
+    }
+
+    tasks.register("initContainer", Exec) {
+        commandLine 'docker-compose', '-f', '../docker/kafka-container.yml', 'up', '-d'
+    }
+
+    tasks.register("waitForContainer") {
+        dependsOn 'initContainer'
+
+        doFirst {
+            def containerNames = ['docker-kafka-1', 'docker-zookeeper-1']
+            containerNames.each { containerName ->
+                def timeoutSeconds = 60 // Timeout in seconds
+                def intervalSeconds = 10 // Polling interval in seconds
+
+                println "Waiting for container '${containerName}' to be ready..."
+
+                def startTime = System.currentTimeMillis()
+                def containerReady = false
+
+                while (System.currentTimeMillis() - startTime < timeoutSeconds * 1000) {
+                    def commandOutput = new ByteArrayOutputStream()
+                    exec {
+                        commandLine 'docker', 'inspect', containerName, '--format="{{.State.Running}}"'
+                        standardOutput = commandOutput
+                    }
+
+                    def output = commandOutput.toString().trim()
+                    if (output == 'true') {
+                        containerReady = true
+                        break
+                    }
+
+                    println "Container '${containerName}' is not yet ready. Waiting..."
+                    sleep(intervalSeconds * 1000)
+                }
+
+                if (containerReady) {
+                    println "Container '${containerName}' is up and running."
+                } else {
+                    throw new GradleException("Timeout waiting for container '${containerName}' to be ready.")
+                }
+            }
+        }
+    }
+
+    tasks.register("stopContainer", Exec) {
+        commandLine 'docker-compose', '-f', '../docker/kafka-container.yml', 'down'
+    }
+
+}
+

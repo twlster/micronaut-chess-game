@@ -18,23 +18,23 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 import static io.micronaut.configuration.kafka.annotation.OffsetReset.EARLIEST;
 
-@Testcontainers
-public class ContainersConfiguration implements TestPropertyProvider {
+//@Testcontainers
+public class ContainersConfiguration {//implements TestPropertyProvider {
 
     public static final Collection<GameDTO> receivedGames = new ConcurrentLinkedDeque<>();
     public static final Collection<GameStateDTO> receivedMoves = new ConcurrentLinkedDeque<>();
 
-    @Container
-    public static KafkaContainer kafka = new KafkaContainer(
-            DockerImageName.parse("confluentinc/cp-kafka:latest"));
-
-    @NonNull
-    @Override
-    public Map<String, String> getProperties() {
-        return Collections.singletonMap(
-                "kafka.bootstrap.servers", kafka.getBootstrapServers()
-        );
-    }
+//    @Container
+//    public static KafkaContainer kafka = new KafkaContainer(
+//            DockerImageName.parse("confluentinc/cp-kafka:latest"));
+//
+//    @NonNull
+//    @Override
+//    public Map<String, String> getProperties() {
+//        return Collections.singletonMap(
+//                "kafka.bootstrap.servers", kafka.getBootstrapServers()
+//        );
+//    }
 
     @KafkaListener(offsetReset = EARLIEST)
     protected static class ChessListener {

@@ -15,11 +15,11 @@ public final class MicronautObjectFactory extends ContainersConfiguration implem
 
     @Override
     public void start() {
-        kafka.start();
+      //  kafka.start();
         Map<String, Object> properties = Collections.singletonMap(
-                "kafka.bootstrap.servers", kafka.getBootstrapServers());
-        embeddedServer = ApplicationContext.run(EmbeddedServer.class, properties, Environment.TEST);
-    }
+//                "kafka.bootstrap.servers", kafka.getBootstrapServers());
+                "kafka.bootstrap.servers", "localhost:9092");
+        embeddedServer = ApplicationContext.run(EmbeddedServer.class, properties, Environment.TEST);}
 
     @Override
     public void stop() {
@@ -28,9 +28,9 @@ public final class MicronautObjectFactory extends ContainersConfiguration implem
         }
         embeddedServer = null;
 
-        if(kafka.isRunning()){
-            kafka.stop();
-        }
+//        if(kafka.isRunning()){
+//            kafka.stop();
+//        }
 
     }
 
